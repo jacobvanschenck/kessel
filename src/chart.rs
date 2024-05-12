@@ -129,8 +129,9 @@ impl fmt::Display for Chart {
                         }
                     }
                 }
+                write!(f, "\n")?;
             }
-            write!(f, "\n\n")?;
+            write!(f, "\n")?;
         }
         Ok(())
     }
