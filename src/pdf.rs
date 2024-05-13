@@ -11,6 +11,7 @@ const FONT_SIZE_BODY: f32 = 14.0;
 const FONT_SIZE_TITLE: f32 = 24.0;
 const PADDING_MM: f32 = 4.233;
 const FONT_TITLE_MM: f32 = FONT_SIZE_TITLE / 3.7795;
+const FONT_BODY_MM: f32 = FONT_SIZE_BODY / 3.7795;
 
 pub fn create_pdf(chart: Chart) {
     let (doc, page1, layer1) = PdfDocument::new(
@@ -90,7 +91,10 @@ pub fn create_pdf(chart: Chart) {
 
     let file_name: String;
     match (chart.title, chart.key) {
-        (Some(title), Some(key)) => file_name = title + &String::from("-") + &key,
+        (Some(title), Some(key)) => {
+            file_name =
+                title.split(" ").collect::<Vec<&str>>().join("-") + &String::from("-") + &key
+        }
         (Some(title), None) => file_name = title,
         _ => file_name = String::from("new chart"),
     }
