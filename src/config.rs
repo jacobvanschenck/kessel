@@ -1,4 +1,5 @@
 use crate::chart::Chart;
+use crate::pdf::create_pdf;
 use std::error::Error;
 use std::fs;
 
@@ -39,6 +40,6 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     sections.for_each(|s| chart.parse_section(s));
 
-    println!("\n{}", chart);
+    create_pdf(chart);
     Ok(())
 }
