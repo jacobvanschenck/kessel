@@ -1,6 +1,7 @@
 use printpdf::*;
 use std::fs::File;
 use std::io::BufWriter;
+use textwidth::{get_text_width, Context, XError};
 
 use crate::chart::Chart;
 
@@ -23,84 +24,97 @@ pub fn create_pdf(chart: Chart) {
 
     let current_layer = doc.get_page(page1).get_layer(layer1);
 
-    let font = doc
-        .add_builtin_font(BuiltinFont::Helvetica)
-        .expect("pdf: Font not loaded.");
+    // let font = doc
+    //     .add_builtin_font(BuiltinFont::Helvetica)
+    //     .expect("pdf: Font not loaded.");
 
-    let font_bold = doc
-        .add_builtin_font(BuiltinFont::HelveticaBold)
-        .expect("pdf: Font not loaded.");
+    // let font_bold = doc
+    //     .add_builtin_font(BuiltinFont::HelveticaBold)
+    //     .expect("pdf: Font not loaded.");
+    //
+    // let font_italic = doc
+    //     .add_builtin_font(BuiltinFont::HelveticaOblique)
+    //     .expect("pdf: Font not loaded.");
 
-    let font_italic = doc
-        .add_builtin_font(BuiltinFont::HelveticaOblique)
-        .expect("pdf: Font not loaded.");
+    let text = "hello";
+    let ctx = Context::new(text).unwrap();
+    let width = get_text_width(&ctx, text).unwrap();
+    println!("Width: {}", width);
 
-    current_layer.begin_text_section();
+    // let words = split_text_into_words(text);
+    // let scaled_words =
+    //     words_to_scaled_words(&words, font, font_index as u32, font_metrics, font_size);
+    //
+    // let total_width: f32 = scaled_words.items.iter().map(|i| i.word_width).sum();
+    //
+    // println!("{}", total_width);
 
-    current_layer.set_font(&font_bold, FONT_SIZE_TITLE);
-    current_layer.set_line_height(FONT_SIZE_BODY * 1.2);
-    current_layer.set_text_cursor(
-        Mm(PADDING_MM * 2.0),
-        Mm(DOC_HEIGHT - FONT_TITLE_MM - { PADDING_MM * 2.0 }),
-    );
+    // current_layer.begin_text_section();
+    //
+    // current_layer.set_font(&font_bold, FONT_SIZE_TITLE);
+    // current_layer.set_line_height(FONT_SIZE_BODY * 1.2);
+    // current_layer.set_text_cursor(
+    //     Mm(PADDING_MM * 2.0),
+    //     Mm(DOC_HEIGHT - FONT_TITLE_MM - { PADDING_MM * 2.0 }),
+    // );
+    //
+    // if let Some(title) = &chart.title {
+    //     current_layer.write_text(title, &font_bold);
+    //     current_layer.add_line_break();
+    // }
+    //
+    // if let Some(artist) = &chart.artist {
+    //     current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
+    //     current_layer.write_text(String::from("Artist: ") + artist, &font_italic);
+    //     current_layer.add_line_break();
+    // }
+    //
+    // if let Some(tempo) = &chart.tempo {
+    //     current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
+    //     current_layer.write_text(
+    //         String::from("Tempo: ") + tempo + &String::from("  |  "),
+    //         &font_italic,
+    //     );
+    // }
+    //
+    // if let Some(key) = &chart.key {
+    //     current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
+    //     current_layer.write_text(String::from("Key: ") + key, &font_italic);
+    // }
+    //
+    // current_layer.add_line_break();
+    // current_layer.add_line_break();
+    //
+    // chart.sections.iter().for_each(|s| {
+    //     current_layer.set_font(&font_bold, FONT_SIZE_BODY);
+    //     current_layer.write_text(&s.title, &font_bold);
+    //     current_layer.add_line_break();
+    //
+    //     current_layer.set_font(&font, FONT_SIZE_BODY);
+    //     s.lines.iter().for_each(|l| {
+    //         l.iter().for_each(|p| {
+    //             if let Some(pair) = &p {
+    //                 current_layer.write_text(&pair.lyric, &font);
+    //             }
+    //         });
+    //         current_layer.add_line_break();
+    //     });
+    //     current_layer.add_line_break();
+    // });
+    // current_layer.end_text_section();
+    //
+    // let file_name: String;
+    // match (chart.title, chart.key) {
+    //     (Some(title), Some(key)) => {
+    //         file_name =
+    //             title.split(" ").collect::<Vec<&str>>().join("-") + &String::from("-") + &key
+    //     }
+    //     (Some(title), None) => file_name = title,
+    //     _ => file_name = String::from("new chart"),
+    // }
 
-    if let Some(title) = &chart.title {
-        current_layer.write_text(title, &font_bold);
-        current_layer.add_line_break();
-    }
-
-    if let Some(artist) = &chart.artist {
-        current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
-        current_layer.write_text(String::from("Artist: ") + artist, &font_italic);
-        current_layer.add_line_break();
-    }
-
-    if let Some(tempo) = &chart.tempo {
-        current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
-        current_layer.write_text(
-            String::from("Tempo: ") + tempo + &String::from("  |  "),
-            &font_italic,
-        );
-    }
-
-    if let Some(key) = &chart.key {
-        current_layer.set_font(&font_italic, FONT_SIZE_SUBTITLE);
-        current_layer.write_text(String::from("Key: ") + key, &font_italic);
-    }
-
-    current_layer.add_line_break();
-    current_layer.add_line_break();
-
-    chart.sections.iter().for_each(|s| {
-        current_layer.set_font(&font_bold, FONT_SIZE_BODY);
-        current_layer.write_text(&s.title, &font_bold);
-        current_layer.add_line_break();
-
-        current_layer.set_font(&font, FONT_SIZE_BODY);
-        s.lines.iter().for_each(|l| {
-            l.iter().for_each(|p| {
-                if let Some(pair) = &p {
-                    current_layer.write_text(&pair.lyric, &font);
-                }
-            });
-            current_layer.add_line_break();
-        });
-        current_layer.add_line_break();
-    });
-    current_layer.end_text_section();
-
-    let file_name: String;
-    match (chart.title, chart.key) {
-        (Some(title), Some(key)) => {
-            file_name =
-                title.split(" ").collect::<Vec<&str>>().join("-") + &String::from("-") + &key
-        }
-        (Some(title), None) => file_name = title,
-        _ => file_name = String::from("new chart"),
-    }
-
-    doc.save(&mut BufWriter::new(
-        File::create(file_name + ".pdf").expect("Could not create pdf."),
-    ))
-    .expect("Could not save file");
+    // doc.save(&mut BufWriter::new(
+    //     File::create(file_name + ".pdf").expect("Could not create pdf."),
+    // ))
+    // .expect("Could not save file");
 }
